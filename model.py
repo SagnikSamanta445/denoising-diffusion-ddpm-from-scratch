@@ -180,8 +180,32 @@ def tiny_unet_forward(x, t, params: dict):
     # step 4
     return F.conv2d(h, params['conv_out_w'], params['conv_out_b'],padding=1)
 
-# Step 12 - make_blob_dataset (not yet solved)
-# TODO: implement
+# Step 12 - make_blob_dataset
+import torch
+
+
+def make_blob_dataset(n: int = 128, size: int = 8, seed: int = 0):
+    x = torch.zeros(n, 1, size, size)
+
+    radius = size // 4
+
+    torch.manual_seed(seed)
+
+    for i in range(n):
+        cy, cx = torch.randint(radius, size - radius, (2,))
+
+        # Create a grid of pixel coordinates
+        y, x_coord = torch.meshgrid(
+            torch.arange(size),
+            torch.arange(size),
+            indexing="ij"
+        )
+
+        dist_sq = (y - cy) ** 2 + (x_coord - cx) ** 2
+
+        x[i, 0] = (dist_sq <= radius ** 2).float()
+
+    return x
 
 # Step 13 - ddpm_train_step (not yet solved)
 # TODO: implement
